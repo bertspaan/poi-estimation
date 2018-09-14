@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <title>POIs!</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <link href='https://unpkg.com/mapbox-gl@0.43.0/dist/mapbox-gl.css' rel='stylesheet' />
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+    body {
+      font-family: monospace;
+      width: 800px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="map">
+  </div>
+  <div id="locations">
+  </div>
+  <script type="module">
+    import {Runtime, Inspector} from 'https://unpkg.com/@observablehq/notebook-runtime?module'
+    import notebook from 'https://api.observablehq.com/@bertspaan/poi-estimation.js'
+
+    Runtime.load(notebook, (cell) => {
+      if (cell.name === 'map') {
+        return {
+          fulfilled: (value) => {
+            document.getElementById('map').appendChild(value)
+          }
+        }
+      } else if (cell.name === 'setCenter') {
+        return {
+          fulfilled: (value) => {
+            window.setCenter = value
+          }
+        }
+      } else if (cell.name === 'locations') {
+        return {
+          fulfilled: (value) => {
+            d3.select('#locations').selectAll('button')
+              .data(value)
+              .enter()
+               .append('button')
+               .html((d) => d.name)
+               .on('click', (d) => {
+                 setCenter(d.center)
+               })
+          }
+        }
+      } else {
+        return true
+      }
+    })
+  </script>
+</body>
+</html>
